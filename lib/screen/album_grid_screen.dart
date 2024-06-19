@@ -67,6 +67,7 @@ class _AlbumGridScreenState extends State<AlbumGridScreen> {
   }
 }
 
+//
 class AlbumGridCard extends StatelessWidget {
   const AlbumGridCard(AssetPathEntity this.data, {super.key});
 
