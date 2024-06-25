@@ -1,11 +1,10 @@
-import 'dart:io';
-
 import 'package:exif_gallery/util/route.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:photo_manager/photo_manager.dart';
-import 'package:photo_view/photo_view.dart';
+import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
 
+import '../model/album_model.dart';
 
 class AlbumGridScreen extends StatefulWidget {
   const AlbumGridScreen({super.key});
@@ -15,7 +14,10 @@ class AlbumGridScreen extends StatefulWidget {
 }
 
 class _AlbumGridScreenState extends State<AlbumGridScreen> {
-  List<AssetPathEntity>? _albums;
+  // List<AssetPathEntity>? _albums;
+  // List<AssetEntity>? _first;
+
+  List<AlbumModel>? _albumList;
 
   @override
   void initState() {
@@ -24,19 +26,30 @@ class _AlbumGridScreenState extends State<AlbumGridScreen> {
   }
 
   void _checkPermission() async {
+    // Permission.
     final access = await PhotoManager.requestPermissionExtend();
 
     if (access.isAuth) {
-      _getAlbumInfo();
+      await _getAlbumInfo();
     } else {
       PhotoManager.openSetting();
     }
   }
 
-  void _getAlbumInfo() async {
+  Future<void> _getAlbumInfo() async {
     final albums = await PhotoManager.getAssetPathList(type: RequestType.image);
+    final List<AssetEntity> firstList = [];
+    final List<AlbumModel> albumsList = [];
+
+    for (var item in albums) {
+      final addedItem = AlbumModel(item);
+      await addedItem.getFirstImageEntity();
+      albumsList.add(addedItem);
+    }
+
     setState(() {
-      _albums = albums;
+      _albumList = albumsList;
+      print("done");
     });
   }
 
@@ -46,21 +59,20 @@ class _AlbumGridScreenState extends State<AlbumGridScreen> {
       appBar: AppBar(
         title: Text("Exif Gallery"),
       ),
-      body: _albums == null
+      body: _albumList == null
           ? const Center(child: CircularProgressIndicator())
           : Padding(
               padding: const EdgeInsets.all(8.0),
               child: GridView.builder(
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      mainAxisSpacing: 10,
+                      mainAxisSpacing: 5,
                       childAspectRatio: 0.8,
-                      crossAxisSpacing: 10,
+                      crossAxisSpacing: 1,
                       crossAxisCount: 3),
-                  itemCount: _albums!.length,
+                  itemCount: _albumList!.length,
                   itemBuilder: (context, iter) {
-                    return AlbumGridCard(
-                      _albums![iter],
-                    );
+                    final item = _albumList![iter];
+                    return AlbumGridCard(item);
                   }),
             ),
     );
@@ -69,9 +81,9 @@ class _AlbumGridScreenState extends State<AlbumGridScreen> {
 
 //
 class AlbumGridCard extends StatelessWidget {
-  const AlbumGridCard(AssetPathEntity this.data, {super.key});
+  const AlbumGridCard(this.data, {super.key});
 
-  final AssetPathEntity data;
+  final AlbumModel data;
 
   @override
   Widget build(BuildContext context) {
@@ -82,21 +94,22 @@ class AlbumGridCard extends StatelessWidget {
       child: Column(
         children: [
           AspectRatio(
-            aspectRatio: 1,
-            child: Container(
-                decoration: BoxDecoration(
-                    color: Colors.grey,
-                    border: Border.all(width: 2, color: Colors.black26),
+              aspectRatio: 1,
+              child: Card(
+                clipBehavior: Clip.antiAlias,
+                shape: RoundedRectangleBorder(
+                    side: BorderSide(width: 1.0),
                     borderRadius: BorderRadius.all(Radius.circular(10))),
-                child: Center(
-                  child: AlbumGridItem(
-                    asset: data,
-                  ),
-                )),
-          ),
+                elevation: 0,
+                child: data.firstImageEntity == null
+                    ? Container()
+                    : AlbumGridItem(
+                        firstAsset: data.firstImageEntity!,
+                      ),
+              )),
           Container(
             child: Text(
-              data.name,
+              data.getAlbumName(),
               style: TextStyle(
                   fontSize: 15,
                   color: Colors.black,
@@ -109,51 +122,16 @@ class AlbumGridCard extends StatelessWidget {
   }
 }
 
-class AlbumGridItem extends StatefulWidget {
-  final AssetPathEntity asset;
+class AlbumGridItem extends StatelessWidget {
+  AssetEntity firstAsset;
 
-  const AlbumGridItem({super.key, required this.asset});
-
-  @override
-  State<AlbumGridItem> createState() => _AlbumGridItemState();
-}
-
-class _AlbumGridItemState extends State<AlbumGridItem> {
-  // AssetEntity? _firstAsset;
-  File? file;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadFirstAsset();
-  }
-
-  Future<void> _loadFirstAsset() async {
-    final list = await _getFirstAsset();
-    final first = await list.first.file;
-
-    if(first!=null){
-      print(first.path);
-    }
-
-    if(list.isNotEmpty){
-      setState(() {
-        // _firstAsset = list.first;
-        file = first;
-      });
-    }
-  }
-
-  Future<List<AssetEntity>> _getFirstAsset() async{
-    final cnt = await widget.asset.assetCountAsync;
-
-    return widget.asset.getAssetListPaged(page: 0, size: cnt);
-  }
+  AlbumGridItem({super.key, required this.firstAsset});
 
   @override
   Widget build(BuildContext context) {
-    return file != null
-        ? PhotoView(imageProvider: FileImage(file!))
-        : Container();
+    return AssetEntityImage(firstAsset,
+        isOriginal: false,
+        thumbnailSize: const ThumbnailSize.square(200),
+        fit: BoxFit.cover);
   }
 }
