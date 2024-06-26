@@ -1,16 +1,23 @@
+import 'dart:io';
+
 import 'package:exif/exif.dart';
 import 'package:photo_manager/photo_manager.dart';
 
-class ImageModel {
-  AssetEntity entity;
+import '../util/Constant.dart';
 
-  ImageModel(this.entity);
+class ImageModel {
+  AssetEntity _entity;
+
+  ImageModel(this._entity);
 
   String make = "";
   String focalLength = "";
 
-  Future<void> getExif()  async {
-    var file = await entity.file;
+  Future<bool> getExif()  async {
+    if(make.isNotEmpty || focalLength.isNotEmpty)
+      return true;
+
+    var file = await _entity.file;
     if (file != null) {
       final exifInfo = await readExifFromFile(file);
 
@@ -18,19 +25,37 @@ class ImageModel {
         return e.key.toLowerCase().contains("make");
       });
 
-      make = makeEntry.isNotEmpty ? makeEntry.first.value.toString() : '';
+      make = makeEntry.isNotEmpty ? makeEntry.first.value.toString() : 'none';
 
       final focalEntry = exifInfo.entries.where((e) {
         return e.key.toLowerCase().contains("focallength");
       });
 
-      focalLength = focalEntry.isNotEmpty ? focalEntry.first.value.toString() : '';
+      focalLength = focalEntry.isNotEmpty ? focalEntry.first.value.toString() : 'none';
 
-      // print("${makeEntry.value}, ${focalEntry.value}");
+      return true;
     }
+
+    return false;
   }
 
   Future<ImageModel> initModel(AssetEntity entity) async {
     return this;
+  }
+
+  Future<File?> getFile() => _entity.file;
+
+  AssetEntity getAsset() => _entity;
+
+  DateTime getDateTime()=> _entity.createDateTime;
+
+  String getFilterString(Filter filter){
+    if(filter == Filter.FOCAL_LENGTH){
+      return focalLength;
+    }else if(filter == Filter.MODEL){
+      return make;
+    }
+
+    return getDateTime().toString();
   }
 }
