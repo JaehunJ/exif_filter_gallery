@@ -123,4 +123,6 @@ class _ExifInfoWidgetState extends State<ExifInfoWidget> {
       )
     );
   }
+
+
 }
