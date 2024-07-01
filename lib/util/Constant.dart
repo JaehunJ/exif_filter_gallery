@@ -9,3 +9,5 @@ enum Filter{
 
   const Filter(this.value);
 }
+
+const FOCAL_LENGTH_MAX = '10000';

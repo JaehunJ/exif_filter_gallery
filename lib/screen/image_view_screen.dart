@@ -63,6 +63,7 @@ class _ExifInfoWidgetState extends State<ExifInfoWidget> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    widget.imageModel.getExifFromPrint();
     // _getExifData();
   }
   //

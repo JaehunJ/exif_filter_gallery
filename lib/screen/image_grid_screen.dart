@@ -96,9 +96,9 @@ class _ImageGridScreenState extends State<ImageGridScreen> {
     if (images != null) {
       images.sort((a, b) {
         if (filter == Filter.MODEL) {
-          return a.make.compareTo(b.make);
+          return a.compareMake(b);
         } else if (filter == Filter.FOCAL_LENGTH) {
-          return a.focalLength.compareTo(b.focalLength);
+          return a.compareFocalLength(b);
         } else if (filter == Filter.DATE_ASC) {
           return a.getDateTime().compareTo(b.getDateTime()) * -1;
         } else {
@@ -144,15 +144,20 @@ class _ImageGridScreenState extends State<ImageGridScreen> {
                   visible: true,
                   child: Container(
                     decoration: BoxDecoration(color: Colors.white),
-                    child: Padding( padding: const EdgeInsets.only(left: 10, right: 10),
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 10, right: 10),
                       child: Row(mainAxisSize: MainAxisSize.max, children: [
                         Text("Exif info"),
-                        Container(padding: const EdgeInsets.only(left: 5, right: 5),),
+                        Container(
+                          padding: const EdgeInsets.only(left: 5, right: 5),
+                        ),
                         Expanded(
                             child: LinearProgressIndicator(
                           value: filterCnt / images!.length,
                         )),
-                        Container(padding: const EdgeInsets.only(left: 5, right: 5),),
+                        Container(
+                          padding: const EdgeInsets.only(left: 5, right: 5),
+                        ),
                         Text("${filterCnt}/${images!.length}"),
                       ]),
                     ),
@@ -238,13 +243,25 @@ class _ImageGridItemState extends State<ImageGridItem> {
                           fit: BoxFit.cover,
                         ),
                       ),
-                      Column(
-                        children: [
-                          Text(widget.info,
-                              style: TextStyle(
-                                  color: Colors.blue,
-                                  backgroundColor: Colors.white)),
-                        ],
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Padding(
+                          padding: EdgeInsets.only(bottom: 10),
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Color.fromRGBO(0, 0, 0, 0.5),
+                                shape: BoxShape.rectangle,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(5))),
+                            child: Padding(
+                              padding: EdgeInsets.only(left: 5, right: 5),
+                              child: Text(widget.info,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                  )),
+                            ),
+                          ),
+                        ),
                       )
                     ],
                   ));
