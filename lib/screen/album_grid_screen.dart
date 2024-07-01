@@ -14,9 +14,6 @@ class AlbumGridScreen extends StatefulWidget {
 }
 
 class _AlbumGridScreenState extends State<AlbumGridScreen> {
-  // List<AssetPathEntity>? _albums;
-  // List<AssetEntity>? _first;
-
   List<AlbumModel>? _albumList;
 
   @override
@@ -38,7 +35,6 @@ class _AlbumGridScreenState extends State<AlbumGridScreen> {
 
   Future<void> _getAlbumInfo() async {
     final albums = await PhotoManager.getAssetPathList(type: RequestType.image);
-    final List<AssetEntity> firstList = [];
     final List<AlbumModel> albumsList = [];
 
     for (var item in albums) {

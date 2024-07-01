@@ -11,7 +11,11 @@ class ImageModel {
   ImageModel(this._entity);
 
   String make = "";
+  String model = "";
   String focalLength = "";
+  String exposureTime = "";
+  String fNumber = "";
+  String iso = "";
 
   Future<bool> getExif()  async {
     if(make.isNotEmpty || focalLength.isNotEmpty)
@@ -27,8 +31,57 @@ class ImageModel {
 
       make = makeEntry.isNotEmpty ? makeEntry.first.value.toString() : 'none';
 
-      final focalEntry = exifInfo.entries.where((e) {
-        return e.key.contains("FocalLength");
+      final modelEntry = exifInfo.entries.where((e){
+        return e.key.toLowerCase().contains("image model");
+      });
+
+      model = modelEntry.isNotEmpty ? modelEntry.first.value.toString() : 'none';
+
+      final exif = exifInfo.entries.where((e){
+        return e.key.toLowerCase().contains("exif");
+      });
+
+      final iso = exif.where((e){
+        return e.key.toLowerCase().contains("isospeedratings");
+      });
+
+      this.iso = iso.isNotEmpty ? iso.first.value.toString() : '';
+
+      final exposureTime = exif.where((e){
+        return e.key.toLowerCase().contains("exposuretime");
+      });
+
+      this.exposureTime = exposureTime.isNotEmpty ? exposureTime.first.value.toString() : '';
+
+      final fNumber = exif.where((e){
+        return e.key.toLowerCase().contains("fnumber");
+      });
+
+      if(fNumber.isNotEmpty){
+        final divItem = fNumber.where((e){
+          return e.value.toString().contains("/");
+        });
+
+        if(divItem.isEmpty){
+          this.fNumber = fNumber.first.toString();
+        }else{
+          final split = divItem.first.value.toString().split("/");
+
+          if(split.isNotEmpty){
+            final a = double.parse(split[0]);
+            final b = double.parse(split[1]);
+
+            this.fNumber = (a/b).toStringAsFixed(2);
+          }else{
+            this.fNumber = split.first;
+          }
+        }
+      }else{
+        this.fNumber = '';
+      }
+
+      final focalEntry = exif.where((e) {
+        return e.key.toLowerCase().contains("focallength");
       });
 
       if(focalEntry.isNotEmpty){
@@ -54,52 +107,25 @@ class ImageModel {
         focalLength = FOCAL_LENGTH_MAX;
       }
 
-      // focalLength = focalEntry.isNotEmpty ? focalEntry.first.value.toString() : 'none';
-
       return true;
     }
 
     return false;
   }
 
-  void getExifFromPrint() async{
+  void getExifToPrint() async{
     var file = await _entity.originBytes;
     if(file != null){
       final exifInfo = await readExifFromBytes(file);
-      final entries = exifInfo.entries.where((e){
+
+      final exif = exifInfo.entries.where((e){
         return e.key.toLowerCase().contains("exif");
-      }).toList();
-
-      for(var item in entries){
-        print("${item.key}: ${item.value}");
-      }
-
-      final focalEntry = exifInfo.entries.where((e) {
-        return e.key.contains("FocalLength");
       });
 
-      if(focalEntry.isNotEmpty){
-        final divItem = focalEntry.where((e){
-          return e.value.toString().contains("/");
-        });
-
-        if(divItem.isNotEmpty){
-          final split = divItem.first.value.toString().split("/");
-
-          if(split.isNotEmpty && split.length > 1){
-            final p = double.parse(split[0]);
-            final div = double.parse(split[1]);
-            // final finalFocalLength =
-            print("result: ${(p/div).toStringAsFixed(1)}");
-            // focalLength =
-          }
-        }
+      for(var item in exifInfo.entries){
+        print('${item.key}:${item.value}');
       }
     }
-  }
-
-  Future<ImageModel> initModel(AssetEntity entity) async {
-    return this;
   }
 
   Future<File?> getFile() => _entity.file;
@@ -110,7 +136,7 @@ class ImageModel {
 
   String getFilterString(Filter filter){
     if(filter == Filter.FOCAL_LENGTH){
-      if(focalLength.isNotEmpty || focalLength != FOCAL_LENGTH_MAX){
+      if(focalLength.isNotEmpty && focalLength != FOCAL_LENGTH_MAX){
         return focalLength;
       }else{
         return 'none';
