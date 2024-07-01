@@ -21,6 +21,8 @@ class _ImageGridScreenState extends State<ImageGridScreen> {
   List<ImageModel>? images;
   late Future<List<ImageModel>> future;
   Filter currentFilter = Filter.DATE_ASC;
+  bool enableExifFilter = false;
+  int filterCnt = 0;
 
   @override
   void initState() {
@@ -37,41 +39,69 @@ class _ImageGridScreenState extends State<ImageGridScreen> {
     final List<ImageModel> list = [];
     for (var item in t) {
       final addedItem = ImageModel(item);
-      await addedItem.getExif();
+      // await addedItem.getExif();
       list.add(addedItem);
     }
     images = list;
+    _getExifInfoFromList();
     return list;
   }
 
-  Widget _popup(){
-    return PopupMenuButton<Filter>(itemBuilder: (context){
+  void _getExifInfoFromList() async {
+    final images = this.images;
+    int cnt = 0;
+    if (images != null) {
+      for (var item in images) {
+        await item.getExif();
+        cnt++;
+
+        setState(() {
+          filterCnt = cnt;
+        });
+      }
+
+      setState(() {
+        enableExifFilter = true;
+      });
+    }
+  }
+
+  Widget _popup(bool enable) {
+    return PopupMenuButton<Filter>(itemBuilder: (context) {
       return [
         _menuItem(Filter.DATE_ASC),
         _menuItem(Filter.DATE_DESC),
-        _menuItem(Filter.MODEL),
-        _menuItem(Filter.FOCAL_LENGTH)
+        _menuItem(Filter.MODEL, enable: enable),
+        _menuItem(Filter.FOCAL_LENGTH, enable: enable)
       ];
     });
   }
 
-  PopupMenuItem<Filter> _menuItem(Filter filter, ){
-    return PopupMenuItem(child: Text(filter.value,), onTap: (){
-      _sortImages(filter);
-    },);
+  PopupMenuItem<Filter> _menuItem(Filter filter, {bool enable = true}) {
+    return PopupMenuItem(
+      child: Text(
+        filter.value,
+        style: TextStyle(color: enable ? Colors.black : Colors.grey),
+      ),
+      onTap: () {
+        if (enable) {
+          _sortImages(filter);
+        }
+      },
+    );
   }
 
-  void _sortImages(Filter filter){
+  void _sortImages(Filter filter) {
     final images = this.images;
-    if(images != null){
-      images.sort((a,b){
-        if(filter == Filter.MODEL){
+    if (images != null) {
+      images.sort((a, b) {
+        if (filter == Filter.MODEL) {
           return a.make.compareTo(b.make);
-        }else if(filter == Filter.FOCAL_LENGTH){
+        } else if (filter == Filter.FOCAL_LENGTH) {
           return a.focalLength.compareTo(b.focalLength);
-        }else if(filter == Filter.DATE_ASC){
+        } else if (filter == Filter.DATE_ASC) {
           return a.getDateTime().compareTo(b.getDateTime()) * -1;
-        }else{
+        } else {
           return a.getDateTime().compareTo(b.getDateTime());
         }
       });
@@ -94,9 +124,7 @@ class _ImageGridScreenState extends State<ImageGridScreen> {
               context.pop();
             },
           ),
-          actions: [
-            _popup()
-          ],
+          actions: [_popup(enableExifFilter)],
           // actions: [IconButton(onPressed: () {
           //   //filter
           //
@@ -110,29 +138,52 @@ class _ImageGridScreenState extends State<ImageGridScreen> {
                 child: CircularProgressIndicator(),
               );
             } else {
-              return Padding(
-                padding: const EdgeInsets.all(5.0),
-                child: GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        mainAxisSpacing: 1,
-                        crossAxisSpacing: 1,
-                        crossAxisCount: 3),
-                    itemCount: images!.length,
-                    itemBuilder: (context, iter) {
-                      return Card(
-                        clipBehavior: Clip.antiAlias,
-                        shape: RoundedRectangleBorder(
-                            side: BorderSide(width: 1.0),
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(10))),
-                        elevation: 0,
-                        child: ImageGridItem(
-                          entity: images![iter],
-                          info: images![iter].getFilterString(currentFilter)
-                        ),
-                      );
-                    }),
-              );
+              return Column(children: [
+                Visibility(
+                  // visible: !enableExifFilter,
+                  visible: true,
+                  child: Container(
+                    decoration: BoxDecoration(color: Colors.white),
+                    child: Padding( padding: const EdgeInsets.only(left: 10, right: 10),
+                      child: Row(mainAxisSize: MainAxisSize.max, children: [
+                        Text("Exif info"),
+                        Container(padding: const EdgeInsets.only(left: 5, right: 5),),
+                        Expanded(
+                            child: LinearProgressIndicator(
+                          value: filterCnt / images!.length,
+                        )),
+                        Container(padding: const EdgeInsets.only(left: 5, right: 5),),
+                        Text("${filterCnt}/${images!.length}"),
+                      ]),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: GridView.builder(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            mainAxisSpacing: 1,
+                            crossAxisSpacing: 1,
+                            crossAxisCount: 3),
+                        itemCount: images!.length,
+                        itemBuilder: (context, iter) {
+                          return Card(
+                            clipBehavior: Clip.antiAlias,
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(width: 1.0),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10))),
+                            elevation: 0,
+                            child: ImageGridItem(
+                                entity: images![iter],
+                                info: images![iter]
+                                    .getFilterString(currentFilter)),
+                          );
+                        }),
+                  ),
+                ),
+              ]);
             }
           },
         ));
@@ -172,25 +223,31 @@ class _ImageGridItemState extends State<ImageGridItem> {
             return Container();
           } else {
             if (snapshot.data == true) {
-
               return GestureDetector(
-                onTap: () {
-                  context.push(Destination.image_view.path,
-                      extra: widget.entity);
-                },
-                child: Stack(children: [
-                  AssetEntityImage(
-                    widget.entity.getAsset(),
-                    isOriginal: false,
-                    thumbnailSize: const ThumbnailSize.square(200),
-                    fit: BoxFit.cover,
-                  ),
-                  Column(children: [
-                    Text(widget.info, style:TextStyle(color: Colors.blue, backgroundColor: Colors.white)),
-                  ],)
-
-                ],)
-              );
+                  onTap: () {
+                    context.push(Destination.image_view.path,
+                        extra: widget.entity);
+                  },
+                  child: Stack(
+                    children: [
+                      Positioned.fill(
+                        child: AssetEntityImage(
+                          widget.entity.getAsset(),
+                          isOriginal: false,
+                          thumbnailSize: const ThumbnailSize.square(200),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      Column(
+                        children: [
+                          Text(widget.info,
+                              style: TextStyle(
+                                  color: Colors.blue,
+                                  backgroundColor: Colors.white)),
+                        ],
+                      )
+                    ],
+                  ));
             } else {
               return Container();
             }
@@ -207,4 +264,3 @@ class ImageGridPopupMenu extends StatelessWidget {
     return const Placeholder();
   }
 }
-
