@@ -140,8 +140,8 @@ class _ImageGridScreenState extends State<ImageGridScreen> {
             } else {
               return Column(children: [
                 Visibility(
-                  // visible: !enableExifFilter,
-                  visible: true,
+                  visible: !enableExifFilter,
+                  // visible: true,
                   child: Container(
                     decoration: BoxDecoration(color: Colors.white),
                     child: Padding(
