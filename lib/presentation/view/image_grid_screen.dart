@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
 
-import '../util/route.dart';
+import '../../util/route.dart';
 
 class ImageGridScreen extends StatefulWidget {
   ImageGridScreen({super.key, required this.albumData});

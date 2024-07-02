@@ -1,4 +1,4 @@
-import 'package:exif_gallery/screen/album_grid_screen.dart';
+import 'package:exif_gallery/presentation/view/album_grid_screen.dart';
 import 'package:exif_gallery/util/route.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';

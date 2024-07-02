@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
 
-import '../model/album_model.dart';
+import '../../model/album_model.dart';
 
 class AlbumGridScreen extends StatefulWidget {
   const AlbumGridScreen({super.key});
