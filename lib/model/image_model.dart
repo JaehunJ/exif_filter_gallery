@@ -134,22 +134,26 @@ class ImageModel {
 
   DateTime getDateTime()=> _entity.createDateTime;
 
+  String getMakeModel(){
+    return '${make} ${model}';
+  }
+
   String getFilterString(Filter filter){
     if(filter == Filter.FOCAL_LENGTH){
       if(focalLength.isNotEmpty && focalLength != FOCAL_LENGTH_MAX){
-        return focalLength;
+        return '${focalLength} mm';
       }else{
         return 'none';
       }
     }else if(filter == Filter.MODEL){
-      return make;
+      return getMakeModel();
     }
 
     return getDateTime().toString();
   }
 
   int compareMake(ImageModel b){
-    return this.make.compareTo(b.make);
+    return getMakeModel().compareTo(b.getMakeModel());
   }
 
   int compareFocalLength(ImageModel b){

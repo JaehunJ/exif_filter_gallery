@@ -248,15 +248,15 @@ class _ImageGridItemState extends State<ImageGridItem> {
                         child: Padding(
                           padding: EdgeInsets.only(bottom: 10),
                           child: Container(
-                            decoration: BoxDecoration(
+                            decoration: const BoxDecoration(
                                 color: Color.fromRGBO(0, 0, 0, 0.5),
                                 shape: BoxShape.rectangle,
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(5))),
                             child: Padding(
-                              padding: EdgeInsets.only(left: 5, right: 5),
+                              padding: const EdgeInsets.only(left: 5, right: 5),
                               child: Text(widget.info,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     color: Colors.white,
                                   )),
                             ),
