@@ -86,7 +86,7 @@ class _ExifInfoWidgetState extends State<ExifInfoWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Color.fromRGBO(255, 255, 255, 0.1),
+      color: Color.fromRGBO(0, 0, 0, 0.3),
       child: Table(
         children: [
           TableRow(
@@ -110,7 +110,7 @@ class _ExifInfoWidgetState extends State<ExifInfoWidget> {
           TableRow(
               children: [
                 Text('shutter speed', style: TextStyle(color: Colors.white),),
-                Text('${widget.imageModel.exposureTime} ', style: TextStyle(color: Colors.white),),
+                Text('${widget.imageModel.exposureTime} s', style: TextStyle(color: Colors.white),),
               ]
           ),
           TableRow(
@@ -123,6 +123,4 @@ class _ExifInfoWidgetState extends State<ExifInfoWidget> {
       )
     );
   }
-
-
 }

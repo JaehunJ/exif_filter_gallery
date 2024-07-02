@@ -56,7 +56,10 @@ class _AlbumGridScreenState extends State<AlbumGridScreen> {
         title: Text("Exif Gallery"),
       ),
       body: _albumList == null
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: Column(mainAxisAlignment:MainAxisAlignment.center,crossAxisAlignment: CrossAxisAlignment.center, children: [
+        CircularProgressIndicator(),
+        Text('앨범 정보 읽는 중')
+      ],))
           : Padding(
               padding: const EdgeInsets.all(8.0),
               child: GridView.builder(
