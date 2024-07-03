@@ -1,5 +1,5 @@
 import 'package:exif/exif.dart';
-import 'package:exif_gallery/data/photo/photo_repository.dart';
+import 'package:exif_gallery/data/repository/photo_repository.dart';
 import 'package:photo_manager/src/types/entity.dart';
 
 class PhotoRepositoryImpl implements PhotoRepository {

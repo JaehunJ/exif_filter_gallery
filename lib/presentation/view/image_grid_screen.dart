@@ -8,6 +8,123 @@ import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
 
 import '../../util/route.dart';
 
+// class ImageGridScreenRiverpod extends ConsumerStatefulWidget {
+//   ImageGridScreenRiverpod({super.key, required this.albumData});
+//
+//   AssetPathEntity albumData;
+//
+//   @override
+//   ConsumerState<ConsumerStatefulWidget> createState() {
+//     return _ImageGridScreenRiverPodState();
+//   }
+// }
+//
+// class _ImageGridScreenRiverPodState extends ConsumerState<ImageGridScreenRiverpod> {
+//   Widget _popup(bool enable) {
+//     return PopupMenuButton<Filter>(itemBuilder: (context) {
+//       return [
+//         _menuItem(Filter.DATE_ASC),
+//         _menuItem(Filter.DATE_DESC),
+//         _menuItem(Filter.MODEL, enable: enable),
+//         _menuItem(Filter.FOCAL_LENGTH, enable: enable)
+//       ];
+//     });
+//   }
+//
+//   PopupMenuItem<Filter> _menuItem(Filter filter, {bool enable = true}) {
+//     return PopupMenuItem(
+//       child: Text(
+//         filter.value,
+//         style: TextStyle(color: enable ? Colors.black : Colors.grey),
+//       ),
+//       onTap: () {
+//         if (enable) {
+//           // _sortImages(filter);
+//         }
+//       },
+//     );
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final viewModel = ref.read(imageGridViewModelProvider.notifier);
+//     final state = ref.watch(imageGridViewModelProvider).value;
+//     // return Placeholder();
+//     // }
+//     //   final state = ref.watch(imageGridViewModelProvider).;
+//     //   final state = ref.watch(imageGridViewModelProvider.call(widget.albumData));
+//     //   final enableExifFilter = viewModel?.enableExifFilter ?? false;
+//     //
+//     return Scaffold(
+//         appBar: AppBar(
+//           title: Text(state?.albumName ?? ''),
+//           leading: IconButton(
+//             icon: Icon(Icons.arrow_back),
+//             onPressed: () {
+//               context.pop();
+//             },
+//           ),
+//           actions: [_popup(state?.enableExifFilter ?? false)],
+//         ),
+//         body: FutureBuilder<List<ImageGridModel>>(
+//           future: viewModel.getImages(widget.albumData),
+//           builder: (BuildContext context, AsyncSnapshot<List<ImageGridModel>> snapshot) {
+//             if (!snapshot.hasData || snapshot.data == null) {
+//               return const Center(
+//                 child: CircularProgressIndicator(),
+//               );
+//             } else {
+//               return Column(children: [
+//                 Visibility(
+//                   visible: state?.enableExifFilter ?? false,
+//                   // visible: true,
+//                   child: Container(
+//                     decoration: BoxDecoration(color: Colors.white),
+//                     child: Padding(
+//                       padding: const EdgeInsets.only(left: 10, right: 10),
+//                       child: Row(mainAxisSize: MainAxisSize.max, children: [
+//                         Text("Exif info"),
+//                         Container(
+//                           padding: const EdgeInsets.only(left: 5, right: 5),
+//                         ),
+//                         Expanded(
+//                             child: LinearProgressIndicator(
+//                           value: viewModel.getExifProgress(),
+//                         )),
+//                         Container(
+//                           padding: const EdgeInsets.only(left: 5, right: 5),
+//                         ),
+//                         Text("${state?.exifCnt ?? 0}/${state?.images.length ?? 0}"),
+//                       ]),
+//                     ),
+//                   ),
+//                 ),
+//                 Expanded(
+//                   child: Padding(
+//                     padding: const EdgeInsets.all(5.0),
+//                     child: GridView.builder(
+//                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+//                             mainAxisSpacing: 1, crossAxisSpacing: 1, crossAxisCount: 3),
+//                         itemCount: state?.images.length ?? 0,
+//                         itemBuilder: (context, iter) {
+//                           return Card(
+//                             clipBehavior: Clip.antiAlias,
+//                             shape: RoundedRectangleBorder(
+//                                 side: BorderSide(width: 1.0), borderRadius: BorderRadius.all(Radius.circular(10))),
+//                             elevation: 0,
+//                             child: ImageGridItem(
+//                                 entity: images![iter], info: images![iter].getFilterString(currentFilter)),
+//                           );
+//                         }),
+//                   ),
+//                 ),
+//               ]);
+//             }
+//           },
+//         ));
+//   }
+// }
+//
 class ImageGridScreen extends StatefulWidget {
   ImageGridScreen({super.key, required this.albumData});
 
@@ -27,10 +144,6 @@ class _ImageGridScreenState extends State<ImageGridScreen> {
   @override
   void initState() {
     super.initState();
-    // if (images == null) {
-    //   _getImageList();
-    // }
-
     future = _getImageListFuture();
   }
 
@@ -125,10 +238,6 @@ class _ImageGridScreenState extends State<ImageGridScreen> {
             },
           ),
           actions: [_popup(enableExifFilter)],
-          // actions: [IconButton(onPressed: () {
-          //   //filter
-          //
-          // }, icon: Icon(Icons.more_horiz))],
         ),
         body: FutureBuilder<List<ImageModel>>(
           future: future,
@@ -168,22 +277,16 @@ class _ImageGridScreenState extends State<ImageGridScreen> {
                     padding: const EdgeInsets.all(5.0),
                     child: GridView.builder(
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            mainAxisSpacing: 1,
-                            crossAxisSpacing: 1,
-                            crossAxisCount: 3),
+                            mainAxisSpacing: 1, crossAxisSpacing: 1, crossAxisCount: 3),
                         itemCount: images!.length,
                         itemBuilder: (context, iter) {
                           return Card(
                             clipBehavior: Clip.antiAlias,
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(width: 1.0),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10))),
+                                side: BorderSide(width: 1.0), borderRadius: BorderRadius.all(Radius.circular(10))),
                             elevation: 0,
                             child: ImageGridItem(
-                                entity: images![iter],
-                                info: images![iter]
-                                    .getFilterString(currentFilter)),
+                                entity: images![iter], info: images![iter].getFilterString(currentFilter)),
                           );
                         }),
                   ),
@@ -230,8 +333,7 @@ class _ImageGridItemState extends State<ImageGridItem> {
             if (snapshot.data == true) {
               return GestureDetector(
                   onTap: () {
-                    context.push(Destination.image_view.path,
-                        extra: widget.entity);
+                    context.push(Destination.image_view.path, extra: widget.entity);
                   },
                   child: Stack(
                     children: [
@@ -246,13 +348,12 @@ class _ImageGridItemState extends State<ImageGridItem> {
                       Align(
                         alignment: Alignment.bottomCenter,
                         child: Padding(
-                          padding: EdgeInsets.only(bottom: 10),
+                          padding: const EdgeInsets.only(bottom: 10),
                           child: Container(
                             decoration: const BoxDecoration(
                                 color: Color.fromRGBO(0, 0, 0, 0.5),
                                 shape: BoxShape.rectangle,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(5))),
+                                borderRadius: BorderRadius.all(Radius.circular(5))),
                             child: Padding(
                               padding: const EdgeInsets.only(left: 5, right: 5),
                               child: Text(widget.info,
@@ -270,14 +371,5 @@ class _ImageGridItemState extends State<ImageGridItem> {
             }
           }
         });
-  }
-}
-
-class ImageGridPopupMenu extends StatelessWidget {
-  const ImageGridPopupMenu({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Placeholder();
   }
 }

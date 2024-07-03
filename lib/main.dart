@@ -1,11 +1,10 @@
-import 'package:exif_gallery/presentation/view/album_grid_screen.dart';
 import 'package:exif_gallery/util/route.dart';
 import 'package:flutter/material.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:photo_manager/photo_manager.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(ProviderScope(child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -20,6 +19,5 @@ class MyApp extends StatelessWidget {
     ),title: 'demo',);
   }
 }
-
 
 
