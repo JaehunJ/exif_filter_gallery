@@ -1,5 +1,3 @@
-
-
 import 'dart:async';
 
 import 'package:exif_gallery/di/usecase_provider.dart';
@@ -22,16 +20,44 @@ class AlbumGridViewState {
 }
 
 @riverpod
-class AlbumGridScreenViewModel extends _$AlbumGridScreenViewModel{
-
+class AlbumGridScreenViewModel extends _$AlbumGridScreenViewModel {
   @override
-  FutureOr<AlbumGridViewState> build(){
+  FutureOr<AlbumGridViewState> build() {
     return AlbumGridViewState(list: [], isAuth: false);
   }
 
-  Future<bool> checkPermission() async{
-    final state = await ref.watch(checkPermissionUseCaseProvider).invoke(null);
+  Future<void> getAlbumList() async {
+    final result = await _getAlbumList();
+    final List<AlbumGridModel> list = [];
 
-    return state.isAuth;
+    for (final item in result) {
+      final first = await _getFirstAssetFromAlbum(item);
+      final name = item.name;
+      list.add(AlbumGridModel(entity: item, first: first, albumName: name));
+    }
+
+    state = AsyncData(state.value!.copyWidth(list: list));
+  }
+
+  Future<List<AssetPathEntity>> _getAlbumList() async {
+    final usecase = ref.read(getAlbumListUseCaseProvider);
+    return usecase.invoke(null);
+  }
+
+  Future<AssetEntity> _getFirstAssetFromAlbum(AssetPathEntity entity) async{
+    final usecase = ref.read(getImageFirstUseCaseProvider);
+    return await usecase.invoke(entity);
+  }
+
+  void checkPermission() async {
+    if(state.hasValue){
+      if(state.value!.isAuth){
+        return;
+      }
+
+      final authState = await ref.watch(checkPermissionUseCaseProvider).invoke(null);
+
+      state = AsyncData(state.value!.copyWidth(isAuth: authState.isAuth));
+    }
   }
 }
