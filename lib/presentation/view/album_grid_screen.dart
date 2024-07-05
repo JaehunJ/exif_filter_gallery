@@ -25,7 +25,7 @@ class _AlbumGridScreenState extends ConsumerState<AlbumGridScreen> {
           itemCount: list.length,
           itemBuilder: (context, iter) {
             final item = list[iter];
-            return AlbumGridCard(item);
+            return AlbumCard(item);
           }),
     );
   }
@@ -43,6 +43,7 @@ class _AlbumGridScreenState extends ConsumerState<AlbumGridScreen> {
             data: (data) {
               if (!data.isAuth) {
                 viewModel.checkPermission();
+                return SizedBox();
               } else {
                 return gridWidget(data.list);
               }
@@ -50,14 +51,14 @@ class _AlbumGridScreenState extends ConsumerState<AlbumGridScreen> {
             error: (e, m) {
               return Text('레전드 상황 발생');
             },
-            loading: () => const CircularProgressIndicator())
+            loading: () => const Center(child: CircularProgressIndicator(),))
         );
   }
 }
 
 //
-class AlbumGridCard extends StatelessWidget {
-  const AlbumGridCard(this.data, {super.key});
+class AlbumCard extends StatelessWidget {
+  const AlbumCard(this.data, {super.key});
 
   final AlbumGridModel data;
 

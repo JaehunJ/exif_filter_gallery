@@ -60,4 +60,6 @@ class AlbumGridScreenViewModel extends _$AlbumGridScreenViewModel {
       state = AsyncData(state.value!.copyWidth(isAuth: authState.isAuth));
     }
   }
+
+  void
 }
