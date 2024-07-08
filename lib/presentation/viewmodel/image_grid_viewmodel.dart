@@ -1,4 +1,5 @@
-import 'package:exif_gallery/di/usecase_provider.dart';
+import 'package:exif_gallery/di/injector.dart';
+import 'package:exif_gallery/domain/usecase/usecase.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -34,6 +35,9 @@ class ImageGridViewState {
 
 @riverpod
 class ImageGridViewModel extends _$ImageGridViewModel {
+  final getImageListUseCase = injector.get<GetImageListUseCase>();
+  final getImageExifUseCase = injector.get<GetImageExifUseCase>();
+
   @override
   FutureOr<ImageGridViewState> build() {
     return ImageGridViewState(
@@ -41,7 +45,7 @@ class ImageGridViewModel extends _$ImageGridViewModel {
   }
 
   Future<List<ImageGridModel>> getImages(AssetPathEntity album) async {
-    final images = await ref.watch(getImageListUseCaseProvider).invoke(album);
+    final images = await getImageListUseCase.invoke(album);
     final List<ImageGridModel> list = [];
 
     for (final item in images) {
@@ -54,11 +58,10 @@ class ImageGridViewModel extends _$ImageGridViewModel {
   Future<int> getExif() async {
     if (!state.hasValue) {
       final value = state.value;
-      final exif = ref.watch(getImageExifUseCaseProvider);
       final list = value!.images;
 
       for (final item in list) {
-        final result = await exif.invoke(item.entity);
+        final result = await getImageExifUseCase.invoke(item.entity);
 
         if (result != null) {
           item.exifModel = result;

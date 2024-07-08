@@ -1,6 +1,7 @@
 import 'dart:async';
 
-import 'package:exif_gallery/di/usecase_provider.dart';
+import 'package:exif_gallery/di/injector.dart';
+import 'package:exif_gallery/domain/usecase/usecase.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -21,6 +22,10 @@ class AlbumGridViewState {
 
 @riverpod
 class AlbumGridScreenViewModel extends _$AlbumGridScreenViewModel {
+  final _getAlbumListUseCase = injector.get<GetAlbumListUseCase>();
+  final _getImageFirstUseCase = injector.get<GetImageFirstUseCase>();
+  final _checkPermissionUseCase = injector.get<CheckPermissionUseCase>();
+
   @override
   FutureOr<AlbumGridViewState> build() {
     return AlbumGridViewState(list: [], isAuth: false);
@@ -40,13 +45,11 @@ class AlbumGridScreenViewModel extends _$AlbumGridScreenViewModel {
   }
 
   Future<List<AssetPathEntity>> _getAlbumList() async {
-    final usecase = ref.read(getAlbumListUseCaseProvider);
-    return usecase.invoke(null);
+    return _getAlbumListUseCase.invoke(null);
   }
 
   Future<AssetEntity> _getFirstAssetFromAlbum(AssetPathEntity entity) async{
-    final usecase = ref.read(getImageFirstUseCaseProvider);
-    return await usecase.invoke(entity);
+    return await _getImageFirstUseCase.invoke(entity);
   }
 
   void checkPermission() async {
@@ -55,7 +58,7 @@ class AlbumGridScreenViewModel extends _$AlbumGridScreenViewModel {
         return;
       }
 
-      final authState = await ref.watch(checkPermissionUseCaseProvider).invoke(null);
+      final authState = await _checkPermissionUseCase.invoke(null);
 
       state = AsyncData(state.value!.copyWidth(isAuth: authState.isAuth));
     }
