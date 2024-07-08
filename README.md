@@ -3,6 +3,11 @@ Exif filter gallery
 기존의 갤러리앱의 필터기능도 좋으나 사진을 취미로 하다보니 사진 정보가 저장된 exif 정보별로 화각별 정렬이나,    
 사진기 모델별 정렬등이 불편하여 만들어보게 됨.
 
+## riverpod-state
+1. riverpod로 state 관리
+2. get_it으로 di 주입
+3. 기본적으로 clean architecture 지향
+
 ## 요구조건
 1. 기본적으로 디바이스내 이미지를 표시한다.
 2. 화면 뎁스는 앨범선택-이미지선택-이미지 순으로 한다.
