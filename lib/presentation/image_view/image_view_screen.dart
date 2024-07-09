@@ -1,30 +1,35 @@
 import 'dart:io';
 
+import 'package:exif_gallery/model/image_grid_model.dart';
 import 'package:exif_gallery/model/image_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:share_plus/share_plus.dart';
 
+import 'provider/image_viewmodel.dart';
 
-class ImageViewScreen extends StatelessWidget {
-  ImageModel entity;
+
+class ImageViewScreen extends ConsumerWidget {
+  ImageGridModel entity;
 
   ImageViewScreen({super.key, required this.entity});
 
-  void _shareFile() async {
-    final file = await entity.getFile();
-    if(file != null){
-      final files = <XFile>[];
-      files.add(XFile(file.path));
-      await Share.shareXFiles(files);
-    //   final list = [file.uri.toString()];
-    //   Share.shareFiles(list);
-    }
-  }
+  // void _shareFile() async {
+  //   final file = await entity.getFile();
+  //   if(file != null){
+  //     final files = <XFile>[];
+  //     files.add(XFile(file.path));
+  //     await Share.shareXFiles(files);
+  //   //   final list = [file.uri.toString()];
+  //   //   Share.shareFiles(list);
+  //   }
+  // }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(imageViewModelProvider);
     return Scaffold(
         backgroundColor: Colors.black,
         appBar: AppBar(
@@ -35,35 +40,41 @@ class ImageViewScreen extends StatelessWidget {
             },
           ),
         ),
-        body: FutureBuilder<File?>(
-          future: entity.getFile(),
-          builder: (BuildContext context, AsyncSnapshot<File?> snapshot) {
-            if (snapshot.data == null) {
-              return const CircularProgressIndicator();
-            } else {
-              return Stack(
-                children: [
-                  PhotoView(
-                    imageProvider: FileImage(snapshot.data!),
-                  ),
-                  Positioned(
-                    left: 20,
-                    right: 20,
-                    bottom: 20,
-                    child: Row(
-                      children: [
-                        IconButton(onPressed: (){
-                          print('a');
-                          _shareFile();
-                        }, icon: Icon(Icons.share, color: Colors.white,))
-                      ],),
-                  ),
-                  Positioned(child: ExifInfoWidget(entity)),
-                ],
-              );
-            }
-          },
-        ));
+        body: Stack(
+          children: [
+            PhotoView(imageProvider: FileImage(state.entity))
+          ],
+        )
+        // FutureBuilder<File?>(
+        //   future: entity.getFile(),
+        //   builder: (BuildContext context, AsyncSnapshot<File?> snapshot) {
+        //     if (snapshot.data == null) {
+        //       return const CircularProgressIndicator();
+        //     } else {
+        //       return Stack(
+        //         children: [
+        //           PhotoView(
+        //             imageProvider: FileImage(snapshot.data!),
+        //           ),
+        //           Positioned(
+        //             left: 20,
+        //             right: 20,
+        //             bottom: 20,
+        //             child: Row(
+        //               children: [
+        //                 IconButton(onPressed: (){
+        //                   print('a');
+        //                   _shareFile();
+        //                 }, icon: Icon(Icons.share, color: Colors.white,))
+        //               ],),
+        //           ),
+        //           Positioned(child: ExifInfoWidget(entity)),
+        //         ],
+        //       );
+        //     }
+        //   },
+        // )
+    );
   }
 }
 

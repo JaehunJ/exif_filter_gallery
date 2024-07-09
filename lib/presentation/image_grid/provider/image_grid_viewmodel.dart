@@ -3,8 +3,8 @@ import 'package:exif_gallery/domain/usecase/usecase.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../model/image_grid_model.dart';
-import '../../util/Constant.dart';
+import '../../../model/image_grid_model.dart';
+import '../../../util/constant.dart';
 
 part 'image_grid_viewmodel.g.dart';
 
@@ -38,6 +38,7 @@ class ImageGridViewModel extends _$ImageGridViewModel {
   final getImageListUseCase = injector.get<GetImageListUseCase>();
   final getImageExifUseCase = injector.get<GetImageExifUseCase>();
 
+  /// return basic state
   @override
   FutureOr<ImageGridViewState> build() {
     return ImageGridViewState(
@@ -77,4 +78,26 @@ class ImageGridViewModel extends _$ImageGridViewModel {
   double getExifProgress() {
     return (state.value?.exifCnt ?? 0) / (state.value?.images.length ?? 1);
   }
+
+  void sortImages(Filter filter) {
+    if(state.value != null){
+      final images = state.value?.images;
+      if (images != null) {
+        images.sort((a, b) {
+          if (filter == Filter.MODEL) {
+            return a.compareMake(b);
+          } else if (filter == Filter.FOCAL_LENGTH) {
+            return a.compareFocalLength(b);
+          } else if (filter == Filter.DATE_ASC) {
+            return a.getDateTime().compareTo(b.getDateTime()) * -1;
+          } else {
+            return a.getDateTime().compareTo(b.getDateTime());
+          }
+        });
+
+        state = AsyncData(state.value!.copyWith(list: images, filter: filter));
+      }
+    }
+  }
+
 }

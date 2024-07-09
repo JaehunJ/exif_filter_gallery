@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:exif_gallery/data/repository/photo_repository.dart';
 import 'package:photo_manager/photo_manager.dart';
 
@@ -46,6 +48,17 @@ class GetImageExifUseCase implements BaseUseCase<Map<String, String>?, AssetEnti
   @override
   Future<Map<String, String>?> invoke(AssetEntity p) {
     return repo.getExif(p);
+  }
+}
+
+class GetFileUseCase implements BaseUseCase<File?, AssetEntity>{
+  final PhotoRepository repo;
+
+  GetFileUseCase({required this.repo});
+
+  @override
+  Future<File?> invoke(AssetEntity p) {
+    return repo.getFile(p);
   }
 }
 

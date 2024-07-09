@@ -1,5 +1,6 @@
 import 'package:exif_gallery/model/album_grid_model.dart';
-import 'package:exif_gallery/presentation/viewmodel/album_grid_screen_viewmodel.dart';
+import 'package:exif_gallery/presentation/album_grid/provider/album_list_notifier.dart';
+import 'package:exif_gallery/presentation/album_grid/provider/album_permission_notifier.dart';
 import 'package:exif_gallery/util/route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,7 +16,6 @@ class AlbumGridScreen extends ConsumerStatefulWidget {
 }
 
 class _AlbumGridScreenState extends ConsumerState<AlbumGridScreen> {
-
   Widget gridWidget(List<AlbumGridModel> list) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -32,37 +32,31 @@ class _AlbumGridScreenState extends ConsumerState<AlbumGridScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = ref.read(albumGridScreenViewModelProvider.notifier);
-    final state = ref.watch(albumGridScreenViewModelProvider);
+    final permissionState = ref.watch(albumPermissionNotifierProvider);
 
     return Scaffold(
         appBar: AppBar(
           title: Text("Exif Gallery"),
         ),
-        body: state.when(
+        body: permissionState.when(
             data: (data) {
-              if (!data.isAuth) {
-                viewModel.checkPermission();
-                return SizedBox();
+              if (data.isAuth) {
+                Future(() async {
+                  await PhotoManager.openSetting();
+                });
+                return const SizedBox();
               } else {
-                if(data.list.isEmpty){
-                  Future((){
-                    viewModel.getAlbumList();
-                  });
-                  return const Center(child: Column(mainAxisAlignment:MainAxisAlignment.center,crossAxisAlignment: CrossAxisAlignment.center, children: [
-                    CircularProgressIndicator(),
-                    Text('앨범 정보 읽는 중')
-                  ],));
-                }else{
-                  return gridWidget(data.list);
-                }
+                final albumListState = ref.watch(albumListNotifierProvider);
+                albumListState.when(
+                    data: (listData) {
+                      return gridWidget(listData.list);
+                    },
+                    error: (e, m) => Text('레전드 상황 발생'),
+                    loading: () => CircularProgressIndicator());
               }
             },
-            error: (e, m) {
-              return Text('레전드 상황 발생');
-            },
-            loading: () => const Center(child: CircularProgressIndicator(),))
-        );
+            error: (error, message) => Text('레전드 상황 발생'),
+            loading: () => const CircularProgressIndicator()));
   }
 }
 

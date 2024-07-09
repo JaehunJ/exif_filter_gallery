@@ -18,5 +18,6 @@ void provideUseCase(){
   injector.registerFactory(()=>GetImageListUseCase(repo: injector.get<PhotoRepository>()));
   injector.registerFactory(()=>GetImageFirstUseCase(repo: injector.get<PhotoRepository>()));
   injector.registerFactory(()=>GetImageExifUseCase(repo: injector.get<PhotoRepository>()));
+  injector.registerFactory(()=>GetFileUseCase(repo: injector.get<PhotoRepository>()));
   injector.registerFactory(()=>CheckPermissionUseCase(repo: injector.get<AlbumRepository>()));
 }

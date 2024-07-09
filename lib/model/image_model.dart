@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:exif/exif.dart';
 import 'package:photo_manager/photo_manager.dart';
 
-import '../util/Constant.dart';
+import '../util/constant.dart';
 
 class ImageModel {
   AssetEntity _entity;
