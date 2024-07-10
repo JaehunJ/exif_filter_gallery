@@ -1,5 +1,4 @@
 import 'package:exif_gallery/model/image_grid_model.dart';
-import 'package:exif_gallery/model/image_model.dart';
 import 'package:exif_gallery/presentation/album_grid/album_grid_screen.dart';
 import 'package:go_router/go_router.dart';
 

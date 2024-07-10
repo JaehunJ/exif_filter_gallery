@@ -1,5 +1,3 @@
-import 'package:exif/exif.dart';
-import 'package:exif_gallery/model/exif_model.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 import '../util/constant.dart';
