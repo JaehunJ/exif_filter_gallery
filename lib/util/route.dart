@@ -4,7 +4,7 @@ import 'package:exif_gallery/presentation/album_grid/album_grid_screen.dart';
 import 'package:go_router/go_router.dart';
 
 import '../model/album_grid_model.dart';
-import '../presentation/view/image_grid_screen.dart';
+import '../presentation/image_grid/image_grid_screen.dart';
 import '../presentation/image_view/image_view_screen.dart';
 
 final GoRouter myRoute = GoRouter(routes: [

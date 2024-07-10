@@ -7,5 +7,4 @@ class AlbumGridModel{
   final AssetEntity first;
   final String albumName;
   AlbumGridModel({required this.entity, required this.first, required this.albumName});
-
 }
