@@ -2,7 +2,7 @@
 import 'package:photo_manager/photo_manager.dart';
 
 
-import '../../data/repository/album_repository.dart';
+import '../../domain/repository/album_repository.dart';
 
 class AlbumRepositoryImpl implements AlbumRepository{
   @override

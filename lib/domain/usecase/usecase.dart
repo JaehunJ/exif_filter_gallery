@@ -1,9 +1,9 @@
 import 'dart:io';
 
-import 'package:exif_gallery/data/repository/photo_repository.dart';
 import 'package:photo_manager/photo_manager.dart';
 
-import '../../data/repository/album_repository.dart';
+import '../repository/album_repository.dart';
+import '../repository/photo_repository.dart';
 import 'base_usecase.dart';
 
 class GetAlbumListUseCase implements BaseUseCase<List<AssetPathEntity>, void> {

@@ -1,9 +1,9 @@
-import 'package:exif_gallery/data/repository/album_repository.dart';
-import 'package:exif_gallery/domain/repository/album_repository_impl.dart';
-import 'package:exif_gallery/domain/repository/photo_repository_impl.dart';
+import 'package:exif_gallery/domain/repository/album_repository.dart';
+import 'package:exif_gallery/data/repository/album_repository_impl.dart';
+import 'package:exif_gallery/data/repository/photo_repository_impl.dart';
 import 'package:get_it/get_it.dart';
 
-import '../data/repository/photo_repository.dart';
+import '../domain/repository/photo_repository.dart';
 import '../domain/usecase/usecase.dart';
 
 final injector = GetIt.instance;

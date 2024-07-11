@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:exif/exif.dart';
-import 'package:exif_gallery/data/repository/photo_repository.dart';
 import 'package:photo_manager/src/types/entity.dart';
 
+import '../../domain/repository/photo_repository.dart';
 import '../../util/constant.dart';
 import '../../util/string_util.dart';
 
