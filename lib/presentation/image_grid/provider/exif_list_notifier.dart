@@ -14,17 +14,19 @@ class ExifListNotifier extends _$ExifListNotifier {
 
   @override
   FutureOr<ExifListState> build() async {
+
+    // final result = await exportExifData(imageList);
     return ExifListState(cnt: 0, isDone: false);
   }
 
-  Stream<int> exportExifData(ImageListState imageList) async* {
+  Future<void> exportExifData(ImageListState imageList) async {
     int cnt = 0;
     for (final item in imageList.images) {
       final result = await getExifUseCase.invoke(item.entity);
       if (result != null) {
         item.exifModel = result;
         state = AsyncData(state.value!.copyWith(cnt: ++cnt, isDone: false));
-        yield cnt;
+        // yield cnt;
       }
     }
   }

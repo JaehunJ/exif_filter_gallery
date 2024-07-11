@@ -11,7 +11,6 @@ import 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
 
 import '../../util/route.dart';
 
-
 class ImageGridScreen extends ConsumerWidget {
   ImageGridScreen({super.key, required this.albumData});
 
@@ -87,28 +86,32 @@ class ExifCountProgressBarWidget extends ConsumerWidget {
 
     return state.when(
         data: (data) {
-          return Visibility(
-              visible: !data.isDone,
-              child: Container(
-                decoration: BoxDecoration(color: Colors.white),
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 10, right: 10),
-                  child: Row(mainAxisSize: MainAxisSize.max, children: [
-                    Text("Exif info"),
-                    Container(
-                      padding: const EdgeInsets.only(left: 5, right: 5),
-                    ),
-                    Expanded(
-                        child: LinearProgressIndicator(
-                      value: data.cnt / length,
-                    )),
-                    Container(
-                      padding: const EdgeInsets.only(left: 5, right: 5),
-                    ),
-                    Text("${data.cnt}/$length"),
-                  ]),
-                ),
-              ));
+          if (length == 0) {
+            return Container();
+          } else {
+            return Visibility(
+                visible: !data.isDone,
+                child: Container(
+                  decoration: BoxDecoration(color: Colors.white),
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 10, right: 10),
+                    child: Row(mainAxisSize: MainAxisSize.max, children: [
+                      Text("Exif info"),
+                      Container(
+                        padding: const EdgeInsets.only(left: 5, right: 5),
+                      ),
+                      Expanded(
+                          child: LinearProgressIndicator(
+                        value: data.cnt / length,
+                      )),
+                      Container(
+                        padding: const EdgeInsets.only(left: 5, right: 5),
+                      ),
+                      Text("${data.cnt}/$length"),
+                    ]),
+                  ),
+                ));
+          }
         },
         error: (e, m) {
           return Text('레전드 상황 발생');
@@ -125,9 +128,18 @@ class ImageGridBodyPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(imageListNotifierProvider.call(entity));
+    final exifIsDone = ref.watch(exifListNotifierProvider.select((selector) {
+      return selector.value?.isDone ?? false;
+    }));
 
     return state.when(
         data: (data) {
+          if(!exifIsDone){
+            Future((){
+              ref.watch(exifListNotifierProvider.notifier).exportExifData(data);
+            });
+          }
+
           return Expanded(
             child: Padding(
               padding: const EdgeInsets.all(5.0),

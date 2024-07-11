@@ -40,14 +40,14 @@ class _AlbumGridScreenState extends ConsumerState<AlbumGridScreen> {
         ),
         body: permissionState.when(
             data: (data) {
-              if (data.isAuth) {
+              if (!data.isAuth) {
                 Future(() async {
                   await PhotoManager.openSetting();
                 });
                 return const SizedBox();
               } else {
                 final albumListState = ref.watch(albumListNotifierProvider);
-                albumListState.when(
+                return albumListState.when(
                     data: (listData) {
                       return gridWidget(listData.list);
                     },
